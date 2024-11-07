@@ -1,0 +1,9 @@
+[package]
+name = "quick_access"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+iced = "0.13.0"
+iced_winit = "0.13.0"
+installed = "=0.1.0"
