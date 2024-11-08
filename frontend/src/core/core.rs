@@ -5,8 +5,7 @@ use iced::Task;
 
 #[derive(Default)]
 pub struct WindowState {
-    installed_apps: Vec<String>,
-    result_apps: Vec<String>,
+    apps: Vec<String>,
     data: String,
 }
 
@@ -34,8 +33,7 @@ impl WindowState {
         (
             WindowState {
                 data: "".to_string(),
-                installed_apps: vec![],
-                result_apps: vec![],
+                apps: vec![],
             },
             Task::perform(WindowState::load_apps(), Message::Init),
         )
@@ -43,13 +41,12 @@ impl WindowState {
     pub fn update(&mut self, message: Message) {
         match message {
             Message::Init(apps) => {
-                self.installed_apps = apps.clone();
-                self.result_apps = apps;
+                self.apps = apps;
             }
             Message::ContentChanged(content) => {
                 self.data = content;
-                let result = search::similarity_search(&self.installed_apps, &self.data);
-                self.result_apps = result;
+                let result = search::similarity_search(&mut self.apps, &self.data);
+                self.apps = result;
             }
             Message::ContentSubmit => {
 
@@ -81,7 +78,7 @@ impl WindowState {
 
     pub fn view(&self) -> Column<Message> {
         let mut result_columns = column![];
-        for app in &self.result_apps {
+        for app in &self.apps {
             result_columns = result_columns.push(text!("{}", app.as_str()).width(700));
         }
         column![
