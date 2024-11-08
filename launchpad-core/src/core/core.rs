@@ -1,6 +1,6 @@
 use std::process::Command;
 
-use iced::keyboard;
+use iced::{keyboard, Task};
 use iced::widget::{text_input, Column};
 use iced::widget::{button, column, text};
 use iced::Alignment::Center;
@@ -12,14 +12,28 @@ pub struct WindowState{
 
 #[derive(Debug, Clone)]
 pub enum Message {
+    Init(Vec<String>),
     ContentChanged(String),
     ContentSubmit
 }
 
 impl WindowState{
+    async fn load_apps()->Vec<String>{
+        let apps = installed::list().unwrap();
+        for app in apps{
+            
+        }
+        vec!["".to_string()]
+    }
+    pub fn new()->(Self,Task<Message>){
+        (WindowState{data: "".to_string()},Task::perform(WindowState::load_apps(), Message::Init))
+    }
     pub fn update(&mut self,message: Message){
         
         match message{
+            Message::Init(apps)=>{
+
+            },
             Message::ContentChanged(content)=>{
                 self.data=content;
             },
