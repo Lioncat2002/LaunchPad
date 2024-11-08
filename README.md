@@ -6,4 +6,4 @@ A app launcher written in rust using iced
 https://youtu.be/J4W7cgRUk_c
 
 ## Gallery
-![image](https://github.com/user-attachments/assets/21f309cf-e20b-42a1-83d3-9c264d30cfa3)
+![image](https://github.com/user-attachments/assets/c41a6e8f-936c-4e84-bf84-910bba1afd58)
