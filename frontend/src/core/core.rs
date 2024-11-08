@@ -45,7 +45,7 @@ impl WindowState {
             }
             Message::ContentChanged(content) => {
                 self.data = content;
-                let result = search::similarity_search(&mut self.apps, &self.data);
+                let result = search::similarity_search(&self.apps, &self.data);
                 self.apps = result;
             }
             Message::ContentSubmit => {
