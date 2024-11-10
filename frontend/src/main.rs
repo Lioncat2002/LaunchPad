@@ -3,8 +3,7 @@ use core::core::WindowState;
 use iced::window::Settings;
 
 pub fn main() -> iced::Result {
-    
-    iced::application("LaunchPad", WindowState::update,WindowState::view)
+    iced::application("LaunchPad", WindowState::update, WindowState::view)
         .window(Settings {
             decorations: false,
             size: iced::Size {
