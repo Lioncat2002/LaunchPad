@@ -1,8 +1,6 @@
 [package]
-name = "search"
+name = "common"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-strsim = "0.11.1"
-common={path = "../common"}

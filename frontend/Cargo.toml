@@ -8,3 +8,4 @@ iced = "0.13.0"
 iced_winit = "0.13.0"
 installed = "=0.1.0"
 search={path = "../search"}
+common={path = "../common"}

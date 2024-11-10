@@ -1,3 +1,6 @@
+use std::process::Command;
+
+use common::AppData;
 use iced::widget::{column, scrollable, text};
 use iced::widget::{text_input, Column};
 use iced::Alignment::Center;
@@ -5,25 +8,38 @@ use iced::Task;
 
 #[derive(Default)]
 pub struct WindowState {
-    apps: Vec<String>,
+    apps: Vec<AppData>,
     data: String,
 }
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    Init(Vec<String>),
+    Init(Vec<AppData>),
     ContentChanged(String),
     ContentSubmit,
 }
 
 impl WindowState {
-    async fn load_apps() -> Vec<String> {
+    async fn load_apps() -> Vec<AppData> {
         let apps = installed::list().unwrap();
         let mut loaded_apps = vec![];
         for app in apps {
             let name = app.name().into_owned();
+            let mut path=String::new();
             if name!=""{
-                loaded_apps.push(name);
+                let dump = app.dump();
+                if let Some(start) = dump.find("DisplayIcon: ") {
+                    // Offset by length of "DisplayIcon: "
+                    let start = start + "DisplayIcon: ".len();
+                    // Find the end of the path by looking for the next newline
+                    if let Some(end) = dump[start..].find('\n') { 
+                           path= dump[start..start + end].trim().replace('"', "").to_string()
+                    }
+                }
+                loaded_apps.push(AppData{
+                    name,
+                    path,
+                });
             }
             
         }
@@ -49,7 +65,14 @@ impl WindowState {
                 self.apps = result;
             }
             Message::ContentSubmit => {
-
+                let app=self.apps.get(0);
+                match app {
+                    Some(data) => {
+                        println!("app path: {}",&data.path);
+                        Command::new(&data.path).spawn().expect("failed to launch app");
+                    },
+                    None => println!("Error path for app not found"),
+                }
                 /*let apps = installed::list().unwrap();
                 for app in apps {
                     // metadata accessor fns, these are only evaluated when used
@@ -79,7 +102,7 @@ impl WindowState {
     pub fn view(&self) -> Column<Message> {
         let mut result_columns = column![];
         for app in &self.apps {
-            result_columns = result_columns.push(text!("{}", app.as_str()).width(700));
+            result_columns = result_columns.push(text!("{}", app.name.as_str()).width(700));
         }
         column![
             text_input("Search...", &self.data)
