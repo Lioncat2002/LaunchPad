@@ -1,20 +1,21 @@
-use common::AppData;
+use common::{AppData, GlobalCommand};
 use iced::widget::{column, scrollable, text};
 use iced::widget::{text_input, Column};
 use iced::Alignment::Center;
 use iced::Task;
 
-use super::loader::load_apps;
+use super::loader::load;
 
 #[derive(Default)]
 pub struct WindowState {
     apps: Vec<AppData>,
     query: String,
+    commands:Vec<GlobalCommand>
 }
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    Init(Vec<AppData>),
+    Init((Vec<AppData>,Vec<GlobalCommand>)),
     ContentChanged(String),
     ContentSubmit,
 }
@@ -25,15 +26,18 @@ impl WindowState {
             WindowState {
                 query: "".to_string(),
                 apps: vec![],
+                commands:vec![]
             },
-            Task::perform(load_apps(), Message::Init),
+            Task::perform(load(), Message::Init),
         )
     }
     pub fn update(&mut self, message: Message) {
         match message {
-            Message::Init(apps) => {
-                self.apps = apps;
+            Message::Init(tuple) => {
+                self.apps = tuple.0;
+                self.commands=tuple.1;
             }
+            
             Message::ContentChanged(content) => {
                 self.query = content;
                 let result = search::similarity_search(&self.apps, &self.query);
@@ -42,6 +46,7 @@ impl WindowState {
             Message::ContentSubmit => {
                 commands::parse_command(&self.query, self.apps.first());
             }
+            
         }
     }
 

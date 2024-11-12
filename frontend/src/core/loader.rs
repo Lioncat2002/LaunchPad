@@ -1,6 +1,7 @@
-use common::AppData;
+use common::{AppData, GlobalCommand};
+use extensions::register_all_commands;
 
-pub async fn load_apps() -> Vec<AppData> {
+pub fn load_apps() -> Vec<AppData> {
     let apps = installed::list().unwrap();
     let mut loaded_apps = vec![];
     for app in apps {
@@ -24,4 +25,14 @@ pub async fn load_apps() -> Vec<AppData> {
         }
     }
     loaded_apps
+}
+
+pub fn load_commands()->Vec<GlobalCommand>{
+    let all_commands=register_all_commands();
+    println!("Commands loaded: {:#?}",all_commands);
+    all_commands
+}
+
+pub async fn load()->(Vec<AppData>,Vec<GlobalCommand>){
+    (load_apps(),load_commands())
 }
