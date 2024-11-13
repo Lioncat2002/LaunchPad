@@ -1,5 +1,7 @@
+use std::fs;
+
 use common::GlobalCommand;
-use mlua::{FromLua, Lua, UserData};
+use mlua::{FromLua, Function, Lua, UserData};
 
 #[derive(Debug, Clone, FromLua)]
 pub struct CommandLoader {
@@ -37,19 +39,32 @@ pub fn register_all_commands() -> Vec<GlobalCommand> {
         .set("launchpad", CommandLoader::new())
         .expect("failed to set extension handler");
 
-    lua.load(
+    for file in fs::read_dir("./mods").unwrap(){
+        let entry=file.unwrap();
+        let src=fs::read_to_string(entry.path()).expect(&("failed to read lua file".to_owned()+entry.path().to_str().unwrap()));
+        
+        lua.load(src).exec().expect("Failed to execute mod");
+
+        let handler:Function=lua.globals().get("handler").expect("Handler function not defined");
+        let result:Vec<String>=handler.call(23).expect("Failed to execute function");
+
+        println!("{:#?}",result);
+    }
+    /*lua.load(
         r#"
         launchpad:register_global_command("command1")
         launchpad:register_global_command("command2")
     "#,
     )
     .exec()
-    .expect("Failed to execute mod");
+    .expect("Failed to execute mod");*/
 
     let commands: CommandLoader = lua
         .globals()
         .get("launchpad")
         .expect("Failed to retrieve commands after mod execution");
-
+    
     commands.commands
 }
+
+pub use mlua;
